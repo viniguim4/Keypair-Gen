@@ -46,6 +46,7 @@ pub fn generate_bip39_seed(mnemonic: &Mnemonic, passw: &str) -> Vec<u8> {
     let seed = Seed::new(mnemonic, passw);
     
     println!("BIP39 Seed:{:?}", seed);
+    println!("BIP39 Seed:{:?}", (*seed.as_bytes()).to_vec());
 
     (*seed.as_bytes()).to_vec()
 }
@@ -120,15 +121,17 @@ pub fn derivate_child(l: &Vec<u8>, r: &Vec<u8>, n: u32) -> (Vec<u8>, Vec<u8>, Ve
     //get the result of the hmac
     let hmac_result = hmac.as_ref();
     let (priv_k, chain_c) = hmac_result.split_at(32);  //split result into two 32 byte arrays
-    let calc_priv_k = &BigUint::to_bytes_be(&((BigUint::from_bytes_be(priv_k) + BigUint::from_bytes_be(l)) % BigUint::from_bytes_be(&secp256k1::constants::CURVE_ORDER)));
-    
+    let calc_priv_k = &((BigUint::from_bytes_be(priv_k) + BigUint::from_bytes_be(l)) % BigUint::from_bytes_be(&secp256k1::constants::CURVE_ORDER));
+    let result = BigUint::to_bytes_be(calc_priv_k);
+    let mut byte_calc_priv_k = [0u8; 32];
+    byte_calc_priv_k[32-result.len()..].copy_from_slice(&result);
     // Print L and R as vector u8
     let fp_parent = parent_fingerprint(&l);
 
-    //println!("priv_k: {:?}", calc_priv_k);
+    //println!("priv_k: {:?}", byte_calc_priv_k);
     //println!("chain_c: {:?}", chain_c);
-
-    (calc_priv_k.to_vec(), chain_c.to_vec(), fp_parent)
+    
+    (byte_calc_priv_k.to_vec(), chain_c.to_vec(), fp_parent)
 
 }
 
@@ -195,7 +198,7 @@ fn main() {
     //println!("{:?}", bit_array);
     let mnemonic = generate_mnemonic(entropy);
     let passwrd = "";
-    //let bip39_test = [0xFF, 0xFC, 0xF9, 0xF6, 0xF3, 0xF0, 0xED, 0xEA, 0xE7, 0xE4, 0xE1, 0xDE, 0xDB, 0xD8, 0xD5, 0xD2, 0xCF, 0xCC, 0xC9, 0xC6, 0xC3, 0xC0, 0xBD, 0xBA, 0xB7, 0xB4, 0xB1, 0xAE, 0xAB, 0xA8, 0xA5, 0xA2, 0x9F, 0x9C, 0x99, 0x96, 0x93, 0x90, 0x8D, 0x8A, 0x87, 0x84, 0x81, 0x7E, 0x7B, 0x78, 0x75, 0x72, 0x6F, 0x6C, 0x69, 0x66, 0x63, 0x60, 0x5D, 0x5A, 0x57, 0x54, 0x51, 0x4E, 0x4B, 0x48, 0x45, 0x42];
+    //let bip39_test = [93, 18, 109, 120, 235, 185, 46, 161, 165, 119, 32, 127, 13, 245, 186, 254, 9, 189, 51, 171, 64, 38, 23, 174, 89, 25, 126, 33, 173, 147, 156, 246, 188, 174, 8, 53, 148, 240, 160, 128, 64, 4, 137, 42, 45, 84, 157, 171, 222, 150, 164, 22, 245, 13, 16, 186, 54, 103, 30, 56, 61, 254, 5, 38];
     let bip39_seed = generate_bip39_seed(&mnemonic, &passwrd);
     let (mut l, mut r) = generate_hmac_sha512(&bip39_seed);
     let mut fp_parent = Vec::new();
@@ -212,7 +215,7 @@ fn main() {
 
     derive_extnd_priv_key(&l, &r, 5, fp_parent.try_into().unwrap(), [0x00, 0x00, 0x00, 0x00]);
 
-    for i in 1..500 { //generate 3 wallets after master
+    for i in 1..522 { //generate 3 wallets after master
         (l, r, fp_parent) = derivate_child(&l_2derive, &r_2derive, i);
         println!("eth priv key {:?} : {:?}", i, eth_priv_key(&l));               
         println!("eth address {:?} : {:?}", i, eth_addrss(&l));             
