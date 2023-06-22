@@ -1,6 +1,6 @@
 [package]
 name = "keypair_gen"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -15,6 +15,7 @@ num-bigint = "0.4.3"
 rust-crypto = "0.2.36"
 hex = "0.4.3"
 tiny-keccak = { version = "1.4" }
+tokio = { version = "1.28.2", features = ["macros", "rt-multi-thread"] }
 
 
 
