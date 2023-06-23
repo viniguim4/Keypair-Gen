@@ -1,4 +1,4 @@
-# Keypair-Gen
+# Keypair-Gen [DEPRECATED MD]
 This Rust program generates keypairs for Ethereum wallets using the BIP39 mnemonic seed phrase and the secp256k1 elliptic curve algorithm. It utilizes several libraries such as `rand`, `bip39`, `ring`, `bs58`, `secp256k1`, `num_bigint`, `crypto`, and `tiny_keccak`.
 
 ## Prerequisites
