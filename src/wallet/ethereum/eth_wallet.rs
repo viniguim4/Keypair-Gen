@@ -1,7 +1,8 @@
 use tiny_keccak::keccak256;
 use secp256k1::{SecretKey};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug,)]
 pub struct ETHWallet {
     private_key: String,
     address: String,

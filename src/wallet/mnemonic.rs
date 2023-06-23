@@ -2,22 +2,22 @@ use bip39::{Mnemonic, Language, Seed, MnemonicType};
 
 #[derive(Debug)]
 pub struct MnemonicStruct {
-    pub mnemonic_words: Mnemonic,
+    pub mnemonic_words: String,
     pub mnemonic_size: usize, // 12, 15, 18, 21, 24
     pub bip39_seed: Vec<u8>,
 }
 
-
 impl MnemonicStruct {
     
     pub fn new(byte_array: &Vec<u8>, passw: &str) -> Self {
-        let mnemonic_words = Mnemonic::from_entropy(&byte_array, Language::English).expect("Failed to generate mnemonic");
-        let mnemonic_size = mnemonic_size(&mnemonic_words) ;
-        let bip39_seed = gen_bip39_seed(&mnemonic_words, &passw);
+        let mnemonic_trait = Mnemonic::from_entropy(&byte_array, Language::English).expect("Failed to generate mnemonic");
+        let mnemonic_size = mnemonic_size(&mnemonic_trait) ;
+        let bip39_seed = gen_bip39_seed(&mnemonic_trait, &passw);
+        let mnemonic_words = mnemonic_trait.phrase().to_string()    ;
         MnemonicStruct { mnemonic_words, mnemonic_size, bip39_seed }
     }
 
-    pub fn get_mnemonic(&self) -> &Mnemonic {
+    pub fn get_mnemonic(&self) -> &str {
         &self.mnemonic_words
     }
 
